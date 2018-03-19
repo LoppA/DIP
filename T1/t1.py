@@ -84,8 +84,10 @@ def dig(img, c, n):
     assert(n <= c)
     dimg = np.zeros((n,n)).astype(np.uint8)
 
+    # range para o maximo local
     d = int(c/n)
 
+    # calcula-se o maximo local para cada pixel x,y
     for x in range(n):
         for y in range(n):
             dimg[x,y] = np.max(img[x*d:x*d+d,y*d:y*d+d])
