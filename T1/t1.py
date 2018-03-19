@@ -120,6 +120,7 @@ img_f = b_bits(img_f, b)
 # 'digitalizacao' da imagem
 img_g = dig(img_f, c, n)
 
+############ DELETA[
 '''
 import matplotlib.pyplot as plt
 
@@ -131,11 +132,13 @@ plt.imshow(img_g, cmap='gray')
 plt.colorbar()
 plt.show()
 '''
+############ ]DELETA
 
 ##### Comparacao
 # carrega a referencia
 R = np.load(filename).astype(np.uint8)
 
+############ DELETA[
 import matplotlib.pyplot as plt
 
 ff, axarr = plt.subplots(1,2)
@@ -143,6 +146,7 @@ ff, axarr = plt.subplots(1,2)
 axarr[0].imshow(img_g, cmap='gray')
 axarr[1].imshow(R, cmap='gray')
 plt.show()
+############ ]DELETA
 
 # calcula a funcao
 rmse = sqrt(np.sum((img_g - R)**2))
