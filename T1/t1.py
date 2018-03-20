@@ -48,18 +48,16 @@ def gen_img (f, c, q) :
     # primeiras 4 funcoes sao semelhantes
     if (f < 4):
         img = np.zeros((c,c)).astype(np.float)
-        for x in range(0, c):
-            for y in range(0, c):
+        for x in range(c):
+            for y in range(c):
                 img[x,y] = fun[f](x, y, q)
         return img
 
     # quinta funcao gera a imagem inteira sozinha
     return f5(c)
 
-# normaliza imagem img para inteiro de b bits
+# normaliza imagem img para valores entre 0 e max_val
 def norm(img, max_val):
-    assert (b <= 16)
-
     # maximo e minimo
     mn = np.min(img)
     mx = np.max(img)
@@ -85,7 +83,7 @@ def dig(img, c, n):
     dimg = np.zeros((n,n)).astype(np.uint8)
 
     # range para o maximo local
-    d = int(c/n)
+    d = c//n
 
     # calcula-se o maximo local para cada pixel x,y
     for x in range(n):
@@ -120,33 +118,9 @@ img_f = b_bits(img_f, b)
 # 'digitalizacao' da imagem
 img_g = dig(img_f, c, n)
 
-############ DELETA[
-'''
-import matplotlib.pyplot as plt
-
-plt.imshow(img_f, cmap='gray')
-plt.colorbar()
-plt.show()
-
-plt.imshow(img_g, cmap='gray')
-plt.colorbar()
-plt.show()
-'''
-############ ]DELETA
-
 ##### Comparacao
 # carrega a referencia
 R = np.load(filename).astype(np.uint8)
-
-############ DELETA[
-import matplotlib.pyplot as plt
-
-ff, axarr = plt.subplots(1,2)
-
-axarr[0].imshow(img_g, cmap='gray')
-axarr[1].imshow(R, cmap='gray')
-plt.show()
-############ ]DELETA
 
 # calcula a funcao
 rmse = sqrt(np.sum((img_g - R)**2))
