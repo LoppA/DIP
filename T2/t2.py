@@ -36,7 +36,24 @@ def superres(L1, L2, L3, L4):
     return H
 
 def hist(img):
-    return img
+    h = np.zeros(256, dtype=int)
+
+    for y in range(img.shape[0]):
+        for x in range(img.shape[1]):
+            h[img[y,x]] += 1
+
+    for i in range(1, 256):
+        h[i] += h[i-1]
+
+    N, M = img.shape
+
+    ret = np.zeros(img.shape, dtype=np.uint8)
+
+    for r in range(256):
+        new_r = (h[r]*255.0)/float(M*N)
+        ret[np.where(img == r)] = new_r
+
+    return ret
 
 def ajuste_gamma(img, gamma):
     c = 255.0
