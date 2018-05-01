@@ -42,9 +42,9 @@ def gerchberg_papoulis(g, mask, T):
     gk = g
     M = np.fft.fft2(mask)   # transformada de Fourier da mascara M
 
-#    plt.imshow(gk, cmap='gray')
-#    plt.colorbar()
-#    plt.show()
+    plt.imshow(gk, cmap='gray')
+    plt.colorbar()
+    plt.show()
     
     for k in range(T):
         Gk = np.fft.fft2(gk)      # transformada de Fourier da imagem gk
@@ -59,9 +59,11 @@ def gerchberg_papoulis(g, mask, T):
 
         gk = insert(gk, g, mask)  # insere os pixels conhecido
 
-    plt.imshow(gk, cmap='gray')
-    plt.colorbar()
-    plt.show()
+        gk = gk.astype(np.uint8)
+
+        plt.imshow(gk, cmap='gray')
+        plt.colorbar()
+        plt.show()
 
     return gk
 
