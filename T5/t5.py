@@ -4,13 +4,13 @@ import numpy as np
 import imageio
 from math import sqrt
 
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 # Filtra Gk, zerando coeficientes das frequencias de Gk relativas a:
 # maiores ou iguais a 90% do maximo da magitude de M
 # menores ou iguias a 1% do maximo da magnitude de Gk
 def filtra(Gk, M):
-    Gk[np.where(np.logical_or(Gk >= 0.9 * M, Gk <= 0.01 * Gk))] = 0
+    Gk[np.where(np.logical_or(Gk >= 0.9 * M.max(), Gk <= 0.01 * Gk.max()))] = 0
     return Gk
 
 # Realiza convolucao de img com um filtro de media 'sz' x 'sz' no dominio da frequencia
@@ -59,9 +59,9 @@ def gerchberg_papoulis(g, mask, T):
 
         gk = insert(gk, g, mask)  # insere os pixels conhecido
 
-#        plt.imshow(gk, cmap='gray')
-#        plt.colorbar()
-#        plt.show()
+    plt.imshow(gk, cmap='gray')
+    plt.colorbar()
+    plt.show()
 
     return gk
 
