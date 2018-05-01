@@ -4,22 +4,20 @@ import numpy as np
 import imageio
 from math import sqrt
 
-import matplotlib.pyplot as plt
-
 # Filtra Gk, zerando coeficientes das frequencias de Gk relativas a:
-# maiores ou iguais a 90% do maximo da magitude de M
+# maiores ou iguais a 90% do maximo da magitude de M e 
 # menores ou iguias a 1% do maximo da magnitude de Gk
 def filtra(Gk, M):
-    Gk[np.where(np.logical_or(Gk >= 0.9 * M.max(), Gk <= 0.01 * Gk.max()))] = 0
+    Gk[(Gk >= 0.9 * M.max()) & (Gk <= 0.01 * Gk.max())] = 0
     return Gk
 
-# Realiza convolucao de img com um filtro de media 'sz' x 'sz' no dominio da frequencia
-def conv(img, sz):
-    filt = np.zeros(img.shape)
-    filt[0:sz, 0:sz] = np.ones([sz, sz]) / (sz*sz)
+# Realiza convolucao de Gk com um filtro de media 'sz' x 'sz' no dominio da frequencia
+def conv(Gk, sz):
+    filt = np.zeros(Gk.shape)
+    filt[0:sz, 0:sz] = 1 / (sz*sz)
     filt = np.fft.fft2(filt)
 
-    return np.multiply(filt,img)
+    return np.multiply(filt,Gk)
 
 # normaliza a imagem em valores entra 0 e 255
 def norm(img):
@@ -39,19 +37,15 @@ def insert(gk, g0, mask):
 # funcao que aplica o algoritmo de Gerchberg-Papoulis em uma
 # imagem g, com mascara mask, iterando T vezes
 def gerchberg_papoulis(g, mask, T):
-    gk = g
+    gk = np.copy(g)
     M = np.fft.fft2(mask)   # transformada de Fourier da mascara M
-
-    plt.imshow(gk, cmap='gray')
-    plt.colorbar()
-    plt.show()
     
     for k in range(T):
         Gk = np.fft.fft2(gk)      # transformada de Fourier da imagem gk
 
         Gk = filtra(Gk, M)        # filtra Gk
 
-        gk = conv(gk, 7)          # convolucao de gk com filtro de media 7x7
+        Gk = conv(Gk, 7)          # convolucao de Gk com filtro de media 7x7
 
         gk = np.fft.ifft2(Gk)     # transformada inversa
 
@@ -60,10 +54,6 @@ def gerchberg_papoulis(g, mask, T):
         gk = insert(gk, g, mask)  # insere os pixels conhecido
 
         gk = gk.astype(np.uint8)
-
-        plt.imshow(gk, cmap='gray')
-        plt.colorbar()
-        plt.show()
 
     return gk
 
