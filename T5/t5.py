@@ -4,46 +4,74 @@ import numpy as np
 import imageio
 from math import sqrt
 
+import matplotlib.pyplot as plt
+
+# Filtra Gk, zerando coeficientes das frequencias de Gk relativas a:
+# maiores ou iguais a 90% do maximo da magitude de M
+# menores ou iguias a 1% do maximo da magnitude de Gk
 def filtra(Gk, M):
+    Gk[np.where(np.logical_or(Gk >= 0.9 * M, Gk <= 0.01 * Gk))] = 0
     return Gk
 
-def conv(img, n, m):
-    return img
+# Realiza convolucao de img com um filtro de media 'sz' x 'sz' no dominio da frequencia
+def conv(img, sz):
+#    filt = np.ones([sz, sz]) / (sz*sz)
+#    filt = np.fft.fft2(filt)
+
+    filt = np.zeros(img.shape)
+    filt[0:7, 0:7] = np.ones([7, 7]) / (49.0)
+    filt = np.fft.fft2(filt)
+
+    return filt*img
 
 def norm(img):
+    img = np.real(img)
     mn = np.min(img)
     mx = np.max(img)
 
     img = (img-mn)/(mx-mn)
     img = (img * 255)
 
-    return img
+    return img.astype(np.uint8)
 
-def insert(g0, gk):
-    return gk
+def insert(gk, g0, mask):
+    return (1-(mask/255))*g0 + (mask/255)*gk
 
 def gerchberg_papoulis(g, mask, T):
-    gant = g
+    gat = g
     M = np.fft.fft2(mask)
 
-    for k in range(1, T + 1):
-        Gat = np.fft.fft(gant)      # a done
+    plt.imshow(gat, cmap='gray')
+    plt.colorbar()
+    plt.show()
+    
+    for k in range(T):
+        Gat = np.fft.fft2(gat)      # a
+
         Gat = filtra(Gat, M)        # b
-        gat = np.fft.ifft2(Gat)     # c done
-        gat = conv(gat, 7, 7)       # d
-        gat = norm(gat)             # e 
-        gat = insert(g, gat)        # f
 
-        gant = gat.astype(np.uint8)
+        gat = conv(gat, 7)          # d
 
-    return gant
+        gat = np.fft.ifft2(Gat)     # c
+
+        gat = norm(gat)             # e
+
+        gat = insert(gat, g, mask)  # f 
+
+        plt.imshow(gat, cmap='gray')
+        plt.colorbar()
+        plt.show()
+
+    return gat
 
 imgo = imageio.imread(str(input()).rstrip())    # imagem original
 imgi = imageio.imread(str(input()).rstrip())    # imagem deteriorada
 imgm = imageio.imread(str(input()).rstrip())    # mascara
-T = int(input())
+T = int(input())    # numero de iteracoes
 
 res = gerchberg_papoulis(imgi, imgm, T)
 
-rmse = sqrt(np.sum(imgo-res)**2)
+# calculo do rmse
+assert (imgo.shape == res.shape)
+rmse = sqrt(np.sum(np.square(imgo-res)) / (imgo.shape[0]*imgo.shape[1]))
 print("%.5f" % rmse)
