@@ -113,14 +113,14 @@ def filtro_media_contra_harmonica(img, n, Q):
             filtro = img[i1:i2, j1:j2]
 
             # evitar divisao por zero
-            if(np.amin(filtro) == 0 and Q < 0.0):
+            if (Q < 0 and np.amin(filtro) == 0):
                 ret[i,j] = img[i,j]
             else:
                 # calculo da formula
                 A = np.sum(np.power(filtro, Q + 1))
                 B = np.sum(np.power(filtro, Q))
-
                 ret[i,j] = A/B
+
 
     return ret.astype(np.uint8)
 
@@ -142,6 +142,17 @@ else:
     # metodo 3
     Q = float(input())
     Iout = filtro_media_contra_harmonica(Inoisy, N, Q)
+
+
+'''
+import matplotlib.pyplot as plt
+
+plt.imshow(Inoisy, cmap='gray')
+plt.show()
+
+plt.imshow(Iout, cmap='gray')
+plt.show()
+'''
 
 # calculo e print do erro rmse
 assert(Iout.shape == Icomp.shape)
