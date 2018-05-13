@@ -94,8 +94,8 @@ if op == 1:
     alpha = float(input())
     Iout = filtro_adaptativo_reducao(Inoisy, N, alpha)
 elif op == 2:
-    m = int(input())
-    Iout = filtro_adaptativo_mediana(Inoisy, N, m)
+    M = int(input())
+    Iout = filtro_adaptativo_mediana(Inoisy, N, M)
 else:
     print("Todo", 3)
 
