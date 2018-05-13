@@ -44,43 +44,61 @@ def filtro_adaptativo_reducao(img, n, alpha, EPS = 0.001):
 
     return ret.astype(np.uint8)
 
-def filtro_adaptativo_mediana(img, n, M):
+def filtro_adaptativo_reducao(img, n, alpha, EPS = 0.001):
     ret = np.zeros(img.shape).astype(np.float)
-    img = wrap(img, M).astype(np.float)
+    img = wrap(img, n).astype(np.float)
+
+    var = alpha*alpha
+    m = n//2
 
     for i in range(ret.shape[0]):
         for j in range(ret.shape[1]):
-            ii = i + M//2
-            jj = j + M//2
+            ii = i + m
+            jj = j + m
 
-            while(n <= M):
-                m = n//2
+            filtro = img[ii-m:ii+m+1, jj-m:jj+m+1]
 
-                if(n%2 == 1):
-                    filtro = img[ii-m:ii+m+1, jj-m:jj+m+1]
+            media = np.mean(filtro)
+            var_local = np.var(filtro)
+
+            assert(ii-m >= 0)
+            assert(jj-m >= 0)
+            assert(ii + m + 1 <= img.shape[0])
+            assert(jj + m + 1 <= img.shape[1])
+
+            if(var_local < EPS):
+                ret[i,j] = img[ii,jj]
+            else:
+                ret[i,j] = img[ii,jj] - (var*(img[ii,jj] - media))/var_local
+
+    return ret.astype(np.uint8)
+
+
+def filtro_media_contra_harmonica(img, n, Q):
+    ret = np.zeros(img.shape).astype(np.float)
+
+    m = n//2
+
+    for i in range(ret.shape[0]):
+        for j in range(ret.shape[1]):
+            i1 = max(i-m, 0)
+            i2 = min(i+m+1, ret.shape[0])
+
+            j1 = max(j-m, 0)
+            j2 = min(j+m+1, ret.shape[1])
+
+            filtro = img[i1:i2, j1:j2]
+
+            if(np.amin(filtro) == 0):
+                ret[i,j] = img[i,j]
+            else:
+                A = np.sum(np.power(filtro, Q + 1))
+                B = np.sum(np.power(filtro, Q))
+
+                if(B == 0):
+                    ret[i,j] = img[i,j]
                 else:
-                    filtro = img[ii-m+1:ii+m+1, jj-m+1:jj+m+1]
-
-                zmed = np.median(filtro)
-                zmin = np.amin(filtro)
-                zmax = np.amax(filtro)
-
-                a1 = zmed - zmin
-                a2 = zmed - zmax
-
-                if(a1 > 0 and a2 < 0):
-                    b1 = img[ii, jj] - zmin
-                    b2 = zmed - zmax
-                    if(b1 > 0 and b2 < 0):
-                        ret[i,j] = img[ii,jj]
-                    else:
-                        ret[i,j] = zmed
-                    break
-                else:
-                    n+=1
-                    if(n > M):
-                        ret[i,j] = zmed
-    
+                    ret[i,j] = A/B
 
     return ret.astype(np.uint8)
 
@@ -97,7 +115,8 @@ elif op == 2:
     M = int(input())
     Iout = filtro_adaptativo_mediana(Inoisy, N, M)
 else:
-    print("Todo", 3)
+    Q = float(input())
+    Iout = filtro_media_contra_harmonica(Inoisy, N, Q)
 
 assert(Iout.shape == Icomp.shape)
 '''
