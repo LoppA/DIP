@@ -2,19 +2,6 @@
 
 import imageio
 import numpy as np
-import math
-
-try:
-    import matplotlib.pyplot as plt
-except Error:
-    pass
-
-def plot(img):
-    try:
-        plt.imshow(img, cmap='gray')
-        plt.show()
-    except Error:
-        pass
 
 def wrap(img, n):
     m = n//2
@@ -75,8 +62,6 @@ Inoisy = imageio.imread(str(input()).rstrip())
 op = int(input())
 N = int(input())
 
-plot(Inoisy)
-
 if op == 1:
     alpha = float(input())
     Iout = filtro_adaptativo_reducao(Inoisy, N, alpha)
@@ -86,8 +71,6 @@ else:
     print("Todo", 3)
 
 assert(Iout.shape == Icomp.shape)
-
-plot(Iout)
 
 R, S  = Iout.shape
 rmse = np.sqrt(np.sum(np.square(Icomp - Iout)) / (R * S))
