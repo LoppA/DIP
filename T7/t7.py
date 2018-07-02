@@ -28,13 +28,13 @@ def quant(img, b):
     return img
 
 def hist_cor(img, b):
-    hist = np.zeros((1<<b)).astype(np.float64)
     '''
         Retorna histograma normalizado da ocorrencia de tons de cinza na imagem img
         img: imagem a ser processada
         b: quantidade de bits que representa os tons de cinza
         retorno -> hist: histograma normalizado
     '''
+    hist = np.zeros((1<<b)).astype(np.float64)
 
     for i in range(img.shape[0]):
         for j in range(img.shape[1]):
